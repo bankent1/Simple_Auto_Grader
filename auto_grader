@@ -7,14 +7,26 @@
 EXE_GIVEN=
 MY_EXE=
 
+if [ "$EXE_GIVEN" == "" ] || [ "$MY_EXE" == "" ]; then
+	echo -e "No executables specified. Edit the grader with the names of the executables"
+	exit 1
+fi
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
+
 echo "================================================="
 echo "SUPER GRADING SCRIPT GOOOOOOOOOO!!!"
 echo "------------------------------------"
 
 total=0
 passed=0
+timedout=0
 flag1=0
 flag2=0
+	
 
 for TESTCASE in ./*.in; do
 	echo "Testing $TESTCASE . . . "
@@ -25,6 +37,8 @@ for TESTCASE in ./*.in; do
 	ex_rc=$(echo $?)
 	if [ $ex_rc -eq 124 ]; then
 		echo "$EXE_GIVEN timed out! :("
+		echo -e "\n"
+		timedout=$((timedout + 1))
 		continue
 	fi
 	
@@ -32,6 +46,8 @@ for TESTCASE in ./*.in; do
 	my_rc=$(echo $?)
 	if [ $my_rc -eq 124 ]; then
 		echo "$MY_GIVEN timed out! :("
+		echo -e "\n"
+		timedout=$((timedout + 1))
 		continue
 	fi
 
@@ -40,19 +56,19 @@ for TESTCASE in ./*.in; do
 	# check if stdout and rc match on both executables
 	echo -n "Output: "
 	if [ "$output" == "" ]; then
-		echo "PASSED"
+		echo -e "${GREEN}PASSED${NC}"
 		flag1=1
 	else
-		echo "FAILED"
+		echo -e "${RED}FAILED${NC}"
 		flag1=0
 	fi
 
 	echo -n "Return Code: "
 	if [ "$ex_rc" == "$my_rc" ]; then
-		echo "PASSED"
+		echo -e "${GREEN}PASSED${NC}"
 		flag2=1
 	else
-		echo "FAILED"
+		echo -e "${RED}FAILED${NC}"
 		flag2=0
 	fi
 
@@ -77,5 +93,6 @@ echo "Total: $total"
 echo -e "\n"
 echo -e "\tScore: $score%"
 echo -e "\n"
+echo "Time Outs: $timedout"
 echo "Done."
 echo "================================================="
