@@ -7,10 +7,34 @@
 EXE_GIVEN=
 MY_EXE=
 
+# check for executables
 if [ "$EXE_GIVEN" == "" ] || [ "$MY_EXE" == "" ]; then
 	echo -e "No executables specified. Edit the grader with the names of the executables"
 	exit 1
 fi
+
+if [ ! -f "./$EXE_GIVEN" ]; then
+	echo "The exec '$EXE_GIVEN' not found, is it in current directory?"
+	exit 1
+fi
+
+if [ ! -f "./$MY_EXE" ]; then
+	echo -e "The exec '$MY_EXE' not found, is it in current directory?"
+	exit 1
+fi
+
+# check if tests are in specified path
+if [ "$1" == "" ]; then
+	testpath=.
+else
+	testpath=$1
+fi
+
+if [ ! -f "$testpath"/*.in ]; then
+	echo "No .in files found for testing :("
+	exit 1
+fi
+
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -26,9 +50,8 @@ passed=0
 timedout=0
 flag1=0
 flag2=0
-	
 
-for TESTCASE in ./*.in; do
+for TESTCASE in "$testpath"/*.in; do
 	echo "Testing $TESTCASE . . . "
 
 	# run run and store outputs and rc of both executables (10 sec timeout)
